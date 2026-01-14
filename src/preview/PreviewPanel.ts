@@ -96,7 +96,7 @@ export class PreviewPanel {
           const elementDesc = message.data.tagName
             ? `<${message.data.tagName}${message.data.id ? '#' + message.data.id : ''}>`
             : `position (${message.data.x}, ${message.data.y})`;
-          vscode.window.showInformationMessage(`${elementDesc} copied! Paste into chat with Cmd+V`);
+          vscode.window.setStatusBarMessage(`$(check) ${elementDesc} copied`, 2000);
         }
         break;
       case 'inspectorError':
