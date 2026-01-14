@@ -1,5 +1,7 @@
 import * as http from 'http';
 import * as https from 'https';
+import * as net from 'net';
+import * as tls from 'tls';
 import { URL } from 'url';
 
 export class ProxyServer {
@@ -142,6 +144,11 @@ export class ProxyServer {
         this.handleRequest(req, res);
       });
 
+      // Handle WebSocket upgrades for HMR
+      this.server.on('upgrade', (req, socket, head) => {
+        this.handleWebSocketUpgrade(req, socket, head);
+      });
+
       this.server.listen(0, '127.0.0.1', () => {
         const address = this.server?.address();
         if (address && typeof address === 'object') {
@@ -230,5 +237,73 @@ export class ProxyServer {
     });
 
     req.pipe(proxyReq);
+  }
+
+  private handleWebSocketUpgrade(req: http.IncomingMessage, clientSocket: net.Socket, head: Buffer) {
+    const targetUrlObj = new URL(this.targetUrl);
+    const isHttps = targetUrlObj.protocol === 'https:';
+    const targetPort = parseInt(targetUrlObj.port) || (isHttps ? 443 : 80);
+
+    // Build the WebSocket upgrade request
+    const wsPath = req.url || '/';
+    const headers = Object.entries(req.headers)
+      .filter(([key]) => key.toLowerCase() !== 'host')
+      .map(([key, value]) => `${key}: ${value}`)
+      .join('\r\n');
+
+    const upgradeRequest = [
+      `${req.method} ${wsPath} HTTP/1.1`,
+      `Host: ${targetUrlObj.host}`,
+      headers,
+      '\r\n'
+    ].join('\r\n');
+
+    // Create connection to target
+    const connectToTarget = () => {
+      if (isHttps) {
+        return tls.connect({
+          host: targetUrlObj.hostname,
+          port: targetPort,
+          rejectUnauthorized: false // Accept self-signed certs
+        });
+      } else {
+        return net.connect({
+          host: targetUrlObj.hostname,
+          port: targetPort
+        });
+      }
+    };
+
+    const targetSocket = connectToTarget();
+
+    targetSocket.on('connect', () => {
+      // Send the upgrade request
+      targetSocket.write(upgradeRequest);
+      if (head.length > 0) {
+        targetSocket.write(head);
+      }
+
+      // Pipe data bidirectionally
+      targetSocket.pipe(clientSocket);
+      clientSocket.pipe(targetSocket);
+    });
+
+    targetSocket.on('error', (err) => {
+      console.error('[Proxy] WebSocket target error:', err.message);
+      clientSocket.end();
+    });
+
+    clientSocket.on('error', (err) => {
+      console.error('[Proxy] WebSocket client error:', err.message);
+      targetSocket.end();
+    });
+
+    clientSocket.on('close', () => {
+      targetSocket.end();
+    });
+
+    targetSocket.on('close', () => {
+      clientSocket.end();
+    });
   }
 }
