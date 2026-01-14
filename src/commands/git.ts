@@ -338,25 +338,45 @@ export async function deleteBranch(): Promise<void> {
   }
 
   // Get default branch to switch to
-  const defaultBranch = getDefaultBranch(cwd);
+  let defaultBranch = getDefaultBranch(cwd);
 
   if (currentBranch === defaultBranch) {
     vscode.window.showErrorMessage(`Cannot delete the default branch (${defaultBranch})`);
     return;
   }
 
+  // If no other branch exists, offer to create main
   if (!defaultBranch) {
-    vscode.window.showErrorMessage('No other branch to switch to. Create another branch first.');
-    return;
+    if (currentBranch === 'main') {
+      vscode.window.showErrorMessage('Cannot delete the main branch');
+      return;
+    }
+
+    const createMain = await vscode.window.showWarningMessage(
+      `No other branch exists. Create "main" and delete "${currentBranch}"?`,
+      { modal: true },
+      'Create main & Delete'
+    );
+
+    if (createMain !== 'Create main & Delete') return;
+
+    try {
+      // Create main branch from current state
+      execGit(['branch', 'main'], cwd);
+      defaultBranch = 'main';
+    } catch (err: any) {
+      vscode.window.showErrorMessage(`Failed to create main branch: ${err.message}`);
+      return;
+    }
+  } else {
+    const confirm = await vscode.window.showWarningMessage(
+      `Delete branch "${currentBranch}"? This will switch to ${defaultBranch} first.`,
+      { modal: true },
+      'Delete'
+    );
+
+    if (confirm !== 'Delete') return;
   }
-
-  const confirm = await vscode.window.showWarningMessage(
-    `Delete branch "${currentBranch}"? This will switch to ${defaultBranch} first.`,
-    { modal: true },
-    'Delete'
-  );
-
-  if (confirm !== 'Delete') return;
 
   try {
     // Switch to default branch first
