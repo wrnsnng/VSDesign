@@ -4,9 +4,9 @@ A VS Code extension that creates a simplified workspace for designers doing AI p
 
 ## What it does
 
-Designer Mode splits your VS Code into a focused layout:
-- **Left panel**: GitHub Copilot Chat for AI-assisted development
-- **Right panel**: Live preview of your application with element inspector
+Designer Mode creates a focused workspace with:
+- **GitHub Copilot Chat** for AI-assisted development
+- **Live preview** of your application with element inspector
 
 This setup lets designers iterate on UI changes by describing what they want in natural language, seeing the results instantly, and selecting specific elements to reference in follow-up prompts.
 
