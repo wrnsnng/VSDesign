@@ -138,12 +138,12 @@ export async function selectBranch(): Promise<void> {
     if (stashed) {
       try {
         execGit(['stash', 'pop'], cwd);
-        vscode.window.showInformationMessage(`Switched to branch: ${branchName} (changes restored)`);
+        vscode.window.setStatusBarMessage(`$(check) Switched to ${branchName} (changes restored)`, 3000);
       } catch {
-        vscode.window.showWarningMessage(`Switched to branch: ${branchName}. Note: Could not restore stashed changes automatically - use 'git stash pop' manually if needed.`);
+        vscode.window.setStatusBarMessage(`$(warning) Switched to ${branchName} - run 'git stash pop' to restore changes`, 5000);
       }
     } else {
-      vscode.window.showInformationMessage(`Switched to branch: ${branchName}`);
+      vscode.window.setStatusBarMessage(`$(check) Switched to ${branchName}`, 3000);
     }
   } catch (err: any) {
     vscode.window.showErrorMessage(`Failed to switch branch: ${err.message}`);
@@ -173,7 +173,7 @@ export async function createBranch(): Promise<void> {
 
   try {
     execGit(['checkout', '-b', branchName], cwd);
-    vscode.window.showInformationMessage(`Created and switched to branch: ${branchName}`);
+    vscode.window.setStatusBarMessage(`$(check) Created branch: ${branchName}`, 3000);
   } catch (err: any) {
     vscode.window.showErrorMessage(`Failed to create branch: ${err.message}`);
   }
@@ -190,7 +190,7 @@ export async function publish(): Promise<void> {
   try {
     const status = execGit(['status', '--porcelain'], cwd);
     if (!status) {
-      vscode.window.showInformationMessage('No changes to publish');
+      vscode.window.setStatusBarMessage('$(info) No changes to publish', 3000);
       return;
     }
   } catch {
@@ -241,13 +241,13 @@ export async function publish(): Promise<void> {
                 vscode.env.openExternal(vscode.Uri.parse(compareUrl));
               }
             } else {
-              vscode.window.showInformationMessage('Changes published!');
+              vscode.window.setStatusBarMessage('$(check) Changes published', 3000);
             }
           } else {
-            vscode.window.showInformationMessage('Changes published!');
+            vscode.window.setStatusBarMessage('$(check) Changes published', 3000);
           }
         } else {
-          vscode.window.showInformationMessage('Changes committed locally (no remote configured)');
+          vscode.window.setStatusBarMessage('$(check) Committed locally (no remote)', 3000);
         }
       } catch (err: any) {
         vscode.window.showErrorMessage(`Failed to publish: ${err.message}`);
@@ -267,7 +267,7 @@ export async function resetChanges(): Promise<void> {
   try {
     const status = execGit(['status', '--porcelain'], cwd);
     if (!status) {
-      vscode.window.showInformationMessage('No changes to reset');
+      vscode.window.setStatusBarMessage('$(info) No changes to reset', 3000);
       return;
     }
   } catch {
@@ -287,7 +287,7 @@ export async function resetChanges(): Promise<void> {
     execGit(['reset', '--hard', 'HEAD'], cwd);
     // Also clean untracked files
     execGit(['clean', '-fd'], cwd);
-    vscode.window.showInformationMessage('All changes discarded');
+    vscode.window.setStatusBarMessage('$(check) All changes discarded', 3000);
   } catch (err: any) {
     vscode.window.showErrorMessage(`Failed to reset: ${err.message}`);
   }
@@ -301,7 +301,7 @@ export async function pullChanges(): Promise<void> {
   }
 
   if (!hasRemote(cwd)) {
-    vscode.window.showInformationMessage('No remote configured');
+    vscode.window.setStatusBarMessage('$(info) No remote configured', 3000);
     return;
   }
 
@@ -315,7 +315,7 @@ export async function pullChanges(): Promise<void> {
       try {
         // Fetch and pull
         execGit(['pull'], cwd);
-        vscode.window.showInformationMessage('Pulled latest changes');
+        vscode.window.setStatusBarMessage('$(check) Pulled latest changes', 3000);
       } catch (err: any) {
         vscode.window.showErrorMessage(`Failed to pull: ${err.message}`);
       }
@@ -363,7 +363,7 @@ export async function deleteBranch(): Promise<void> {
     try {
       // Rename current branch to main
       execGit(['branch', '-m', 'main'], cwd);
-      vscode.window.showInformationMessage(`Renamed branch to main`);
+      vscode.window.setStatusBarMessage('$(check) Renamed branch to main', 3000);
       return;
     } catch (err: any) {
       vscode.window.showErrorMessage(`Failed to rename branch: ${err.message}`);
@@ -393,7 +393,7 @@ export async function deleteBranch(): Promise<void> {
       // Remote branch might not exist, that's ok
     }
 
-    vscode.window.showInformationMessage(`Deleted branch: ${currentBranch}`);
+    vscode.window.setStatusBarMessage(`$(check) Deleted branch: ${currentBranch}`, 3000);
   } catch (err: any) {
     vscode.window.showErrorMessage(`Failed to delete branch: ${err.message}`);
   }

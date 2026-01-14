@@ -32,7 +32,7 @@ export async function runInstall(
 
         proc.on('close', (code) => {
           if (code === 0) {
-            vscode.window.showInformationMessage('Dependencies installed successfully');
+            vscode.window.setStatusBarMessage('$(check) Dependencies installed', 3000);
             onComplete(true);
           } else {
             vscode.window.showErrorMessage('Failed to install dependencies');
