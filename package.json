@@ -57,6 +57,16 @@
           "type": "string",
           "default": "npm install",
           "description": "Command to install dependencies"
+        },
+        "designerMode.branchTemplate": {
+          "type": "string",
+          "default": "{user}-prototype-{date}-{time}",
+          "description": "Template for new branch names. Placeholders: {user}, {date} (YYYY-MM-DD), {time} (HHMM)"
+        },
+        "designerMode.branchUser": {
+          "type": "string",
+          "default": "USER",
+          "description": "Your handle/initials for branch names (replaces {user} in template)"
         }
       }
     }

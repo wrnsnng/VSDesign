@@ -157,16 +157,23 @@ export async function createBranch(): Promise<void> {
     return;
   }
 
-  // Generate default name with STAFF placeholder
+  // Generate branch name from template
+  const config = vscode.workspace.getConfiguration('designerMode');
+  const template = config.get<string>('branchTemplate', '{user}-prototype-{date}-{time}');
+  const user = config.get<string>('branchUser', 'USER');
+
   const date = new Date();
   const dateStr = date.toISOString().slice(0, 10);
-  const timeStr = `${date.getHours()}${String(date.getMinutes()).padStart(2, '0')}`;
-  const defaultName = `STAFF-prototype-${dateStr}-${timeStr}`;
+  const timeStr = `${String(date.getHours()).padStart(2, '0')}${String(date.getMinutes()).padStart(2, '0')}`;
+
+  const defaultName = template
+    .replace('{user}', user)
+    .replace('{date}', dateStr)
+    .replace('{time}', timeStr);
 
   const branchName = await vscode.window.showInputBox({
-    prompt: 'Enter branch name (replace STAFF with your handle, e.g., MOB)',
-    value: defaultName,
-    placeHolder: 'MOB-prototype-2026-01-14-1354'
+    prompt: 'Enter branch name',
+    value: defaultName
   });
 
   if (!branchName) return;

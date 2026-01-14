@@ -73,13 +73,23 @@ Configure in VS Code Settings or `.vscode/settings.json`:
 |---------|---------|-------------|
 | `designerMode.serveCommand` | `npm run serve` | Command to start the dev server |
 | `designerMode.installCommand` | `npm install` | Command to install dependencies |
+| `designerMode.branchTemplate` | `{user}-prototype-{date}-{time}` | Template for new branch names |
+| `designerMode.branchUser` | `USER` | Your handle/initials for branch names |
 
-### Example: Using Yarn
+### Branch Template Placeholders
+
+- `{user}` - Replaced with `branchUser` setting
+- `{date}` - Current date (YYYY-MM-DD)
+- `{time}` - Current time (HHMM)
+
+### Example: Team Configuration
 
 ```json
 {
   "designerMode.serveCommand": "yarn dev",
-  "designerMode.installCommand": "yarn install"
+  "designerMode.installCommand": "yarn install",
+  "designerMode.branchUser": "MOB",
+  "designerMode.branchTemplate": "{user}/prototype-{date}"
 }
 ```
 
