@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; frame-src http://localhost:* https://localhost:*;">
+  <link rel="stylesheet" href="${styleUri}">
+  <title>Preview</title>
+</head>
+<body>
+  <div class="toolbar">
+    <button id="startBtn" title="Start dev server">Start preview</button>
+    <button id="stopBtn" title="Stop dev server" disabled>Stop preview</button>
+
+    <span class="spacer"></span>
+
+    <span class="status" id="status">Server stopped</span>
+
+    <button id="refreshBtn" class="toggle-btn" title="Refresh preview" disabled>Refresh</button>
+    <button id="inspectBtn" class="toggle-btn" title="Select element for @element reference" disabled>Inspect</button>
+    <button id="filesBtn" class="toggle-btn" title="Toggle file browser">Files</button>
+    <button id="terminalBtn" class="toggle-btn" title="Toggle terminal">Terminal</button>
+  </div>
+
+  <div class="toolbar git-toolbar">
+    <span class="toolbar-label">Git:</span>
+    <button id="branchSelectBtn" title="Switch branch">View all branches</button>
+    <button id="newBranchBtn" title="Create new branch">New branch</button>
+    <button id="pullBtn" title="Pull latest from remote">Update branch</button>
+    <button id="publishBtn" title="Commit and push changes">Publish</button>
+    <button id="resetBtn" class="danger-btn" title="Discard all changes">Reset branch</button>
+    <button id="deleteBranchBtn" class="danger-btn" title="Delete current branch">Delete branch</button>
+    <span class="spacer"></span>
+    <span class="branch-name" id="branchName"></span>
+  </div>
+
+  <div class="placeholder" id="placeholder">
+    <h2>Preview</h2>
+    <p>Click "Start preview" to launch the dev server</p>
+  </div>
+
+  <div id="previewContainer" class="preview-container" style="display: none;">
+    <iframe class="preview-frame" id="preview"></iframe>
+  </div>
+
+  <script src="${scriptUri}"></script>
+</body>
+</html>

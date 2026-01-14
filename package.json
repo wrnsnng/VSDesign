@@ -1,0 +1,75 @@
+{
+  "name": "designer-mode",
+  "displayName": "Designer Mode",
+  "description": "A simplified VSCode interface for designers",
+  "version": "0.1.0",
+  "publisher": "designer-mode",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [
+    "workspaceContains:**/package.json"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "designerMode.open",
+        "title": "Open Designer Mode",
+        "category": "Designer Mode"
+      },
+      {
+        "command": "designerMode.toggleFiles",
+        "title": "Toggle File Browser",
+        "category": "Designer Mode"
+      },
+      {
+        "command": "designerMode.toggleTerminal",
+        "title": "Toggle Terminal",
+        "category": "Designer Mode"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "designerMode.open",
+        "key": "ctrl+shift+d",
+        "mac": "cmd+shift+d"
+      }
+    ],
+    "chatParticipants": [
+      {
+        "id": "designerMode.element",
+        "name": "element",
+        "description": "Reference a selected element from the preview",
+        "isSticky": false
+      }
+    ],
+    "configuration": {
+      "title": "Designer Mode",
+      "properties": {
+        "designerMode.serveCommand": {
+          "type": "string",
+          "default": "npm run serve",
+          "description": "Command to start the development server"
+        },
+        "designerMode.installCommand": {
+          "type": "string",
+          "default": "npm install",
+          "description": "Command to install dependencies"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "watch": "npm run build -- --watch",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.19.0",
+    "typescript": "^5.0.0"
+  }
+}
