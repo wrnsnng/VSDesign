@@ -37,7 +37,8 @@ export function activate(context: vscode.ExtensionContext) {
     // Initialize server manager
     serverManager = new ServerManager(
       (url) => previewPanel?.setServerUrl(url),
-      () => previewPanel?.setServerStopped()
+      () => previewPanel?.setServerStopped(),
+      () => previewPanel?.refresh()
     );
   });
 

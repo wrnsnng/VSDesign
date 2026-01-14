@@ -9,15 +9,20 @@ export class ServerManager {
   private outputChannel: vscode.OutputChannel;
   private onServerReady: (url: string) => void;
   private onServerStopped: () => void;
+  private onFileChange: () => void;
   private devServerUrl: string | null = null;
+  private fileWatcher: vscode.FileSystemWatcher | null = null;
+  private refreshTimeout: NodeJS.Timeout | null = null;
 
   constructor(
     onServerReady: (url: string) => void,
-    onServerStopped: () => void
+    onServerStopped: () => void,
+    onFileChange: () => void
   ) {
     this.outputChannel = vscode.window.createOutputChannel('Designer Mode');
     this.onServerReady = onServerReady;
     this.onServerStopped = onServerStopped;
+    this.onFileChange = onFileChange;
   }
 
   async start(workspaceFolder: string): Promise<void> {
@@ -56,8 +61,43 @@ export class ServerManager {
       this.process = null;
       this.devServerUrl = null;
       this.stopProxy();
+      this.stopFileWatcher();
       this.onServerStopped();
     });
+
+    // Start file watcher for auto-refresh
+    this.startFileWatcher();
+  }
+
+  private startFileWatcher(): void {
+    // Watch common source file patterns
+    const pattern = '**/*.{js,jsx,ts,tsx,vue,svelte,html,css,scss,sass,less}';
+    this.fileWatcher = vscode.workspace.createFileSystemWatcher(pattern);
+
+    const debouncedRefresh = () => {
+      // Debounce to avoid multiple rapid refreshes
+      if (this.refreshTimeout) {
+        clearTimeout(this.refreshTimeout);
+      }
+      this.refreshTimeout = setTimeout(() => {
+        this.onFileChange();
+      }, 300);
+    };
+
+    this.fileWatcher.onDidChange(debouncedRefresh);
+    this.fileWatcher.onDidCreate(debouncedRefresh);
+    this.fileWatcher.onDidDelete(debouncedRefresh);
+  }
+
+  private stopFileWatcher(): void {
+    if (this.refreshTimeout) {
+      clearTimeout(this.refreshTimeout);
+      this.refreshTimeout = null;
+    }
+    if (this.fileWatcher) {
+      this.fileWatcher.dispose();
+      this.fileWatcher = null;
+    }
   }
 
   private async startProxy(targetUrl: string): Promise<void> {
@@ -99,6 +139,7 @@ export class ServerManager {
     this.process = null;
     this.devServerUrl = null;
     this.stopProxy();
+    this.stopFileWatcher();
     this.onServerStopped();
   }
 
