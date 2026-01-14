@@ -148,9 +148,7 @@ export class PreviewPanel {
     // Add HTML
     if (element.outerHTML) {
       parts.push('');
-      parts.push('```html');
       parts.push(element.outerHTML);
-      parts.push('```');
     }
 
     // Add context note for LLM
