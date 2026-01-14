@@ -153,6 +153,12 @@ export class PreviewPanel {
       parts.push('```');
     }
 
+    // Add context note for LLM
+    parts.push('');
+    parts.push('---');
+    parts.push('The user\'s request below refers to the element above.');
+    parts.push('');
+
     return parts.join('\n');
   }
 
