@@ -4,6 +4,10 @@
   "description": "A simplified VSCode interface for designers",
   "version": "0.1.0",
   "publisher": "designer-mode",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wrnsnng/VSDesign"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
