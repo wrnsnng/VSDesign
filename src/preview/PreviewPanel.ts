@@ -157,6 +157,7 @@ export class PreviewPanel {
     parts.push('');
     parts.push('---');
     parts.push('The user\'s request below refers to the element above.');
+    parts.push('---');
     parts.push('');
 
     return parts.join('\n');
