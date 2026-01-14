@@ -345,27 +345,28 @@ export async function deleteBranch(): Promise<void> {
     return;
   }
 
-  // If no other branch exists, offer to create main
+  // If no other branch exists, offer to rename to main
   if (!defaultBranch) {
     if (currentBranch === 'main') {
       vscode.window.showErrorMessage('Cannot delete the main branch');
       return;
     }
 
-    const createMain = await vscode.window.showWarningMessage(
-      `No other branch exists. Create "main" and delete "${currentBranch}"?`,
+    const renameToMain = await vscode.window.showWarningMessage(
+      `No other branch exists. Rename "${currentBranch}" to "main"?`,
       { modal: true },
-      'Create main & Delete'
+      'Rename to main'
     );
 
-    if (createMain !== 'Create main & Delete') return;
+    if (renameToMain !== 'Rename to main') return;
 
     try {
-      // Create main branch from current state
-      execGit(['branch', 'main'], cwd);
-      defaultBranch = 'main';
+      // Rename current branch to main
+      execGit(['branch', '-m', 'main'], cwd);
+      vscode.window.showInformationMessage(`Renamed branch to main`);
+      return;
     } catch (err: any) {
-      vscode.window.showErrorMessage(`Failed to create main branch: ${err.message}`);
+      vscode.window.showErrorMessage(`Failed to rename branch: ${err.message}`);
       return;
     }
   } else {
