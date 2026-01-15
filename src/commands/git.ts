@@ -387,17 +387,28 @@ export async function deleteBranch(): Promise<void> {
   }
 
   try {
+    // Check if branch exists on remote before we switch
+    let remoteBranchExists = false;
+    try {
+      const remoteRef = execGit(['ls-remote', '--heads', 'origin', currentBranch], cwd);
+      remoteBranchExists = remoteRef.trim().length > 0;
+    } catch {
+      // No remote or can't check, skip remote deletion
+    }
+
     // Switch to default branch first
     execGit(['checkout', defaultBranch], cwd);
 
     // Delete local branch
     execGit(['branch', '-D', currentBranch], cwd);
 
-    // Try to delete remote branch
-    try {
-      execGit(['push', 'origin', '--delete', currentBranch], cwd);
-    } catch {
-      // Remote branch might not exist, that's ok
+    // Delete remote branch only if it exists
+    if (remoteBranchExists) {
+      try {
+        execGit(['push', 'origin', '--delete', currentBranch], cwd);
+      } catch {
+        // Failed to delete remote, but local is deleted
+      }
     }
 
     vscode.window.setStatusBarMessage(`$(check) Deleted branch: ${currentBranch}`, 3000);
