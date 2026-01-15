@@ -1,9 +1,12 @@
 .vscode/**
 .vscode-test/**
-src/**
 node_modules/**
 .gitignore
 tsconfig.json
 **/*.ts
 **/*.map
 _docs/**
+src/chat/**
+src/commands/**
+src/layout/**
+src/server/**
